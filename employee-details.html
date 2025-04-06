@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${employee.name} + ' - Анкета'"></title>
+    <link rel="stylesheet" th:href="@{/styles/profile.css}">
+</head>
+<body>
+<nav>
+    <div class="nav-container">
+        <a href="#skill">О себе</a>
+        <a href="#resume">Опыт работы</a>
+        <a href="#school">Образование</a>
+        <a href="#skills">Навыки</a>
+    </div>
+</nav>
+
+<div class="container">
+    <a th:href="@{/}" class="back-link">← Назад к списку</a>
+
+    <div class="profile-header">
+        <div th:if="${employee.photoPath}">
+            <img th:src="@{${employee.photoPath}}" class="profile-photo" alt="Фото сотрудника">
+        </div>
+        <div th:unless="${employee.photoPath}" class="photo-placeholder">
+            Нет фото
+        </div>
+
+        <div class="profile-info">
+            <h1 th:text="${employee.name}"></h1>
+
+            <div class="contact-info">
+                <p><strong>Телефон:</strong> <span th:text="${employee.phoneNumber}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${employee.email}"></span></p>
+                <p><strong>Telegram:</strong> <span th:text="${employee.telegram}"></span></p>
+            </div>
+        </div>
+    </div>
+    <hr class="divider">
+    <div id="skill" class="skill">
+        <h3 class="section-title">О себе</h3>
+        <div th:text="${employee.skill}"></div>
+    </div>
+    <hr class="divider">
+
+    <div id="resume" class="resume">
+        <h3 class="section-title">Опыт работы</h3>
+        <div th:text="${employee.resume}"></div>
+    </div>
+    <hr class="divider">
+    <div id="skills" class="skills-section">
+        <h3 class="section-title">Навыки</h3>
+        <div class="skills-container">
+            <div th:each="skill : ${employee.skills}" class="skill-badge"
+                 th:text="${T(org.example.model.Skills).values()[skill.ordinal()]}">
+            </div>
+        </div>
+    </div>
+
+    <hr class="divider">
+
+    <div id="school" class="school">
+        <h3 class="section-title">Образование</h3>
+        <div th:text="${employee.school}"></div>
+    </div>
+</div>
+<script>
+    // Добавляем плавную прокрутку
+    document.querySelectorAll('nav a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+
+            window.scrollTo({
+                top: targetElement.offsetTop - 70,
+                behavior: 'smooth'
+            });
+
+            // Добавляем класс active к текущей ссылке
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
+
+    // Добавляем отслеживание скролла для подсветки активного раздела
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('.skill, .resume, .school');
+        const navLinks = document.querySelectorAll('nav a');
+
+        let currentSection = '';
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+
+            if (pageYOffset >= (sectionTop - 100)) {
+                currentSection = '#' + section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === currentSection) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+</body>
+</html>
